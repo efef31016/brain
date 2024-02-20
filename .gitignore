@@ -3,3 +3,4 @@ venv
 *.txt
 *.png
 *.jpg
+.env*
