@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="icon" href="/static/images/logo.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ page_title }}</h1>
+            <p>{{ welcome_message }}</p>
+        </header>
+        <main>
+            <section class="counts">
+                <div class="count support">
+                    <h2>支持</h2>
+                    <p id="trueCount">Loading...</p>
+                </div>
+                <div class="count oppose">
+                    <h2>不支持</h2>
+                    <p id="falseCount">Loading...</p>
+                </div>
+            </section>
+            <section class="debate-selection">
+                <label for="debate-topics" class="visually-hidden">選擇辯論題目</label>
+                <select id="debate-topics" aria-label="選擇辯論題目" onchange="handleTopicChange()">
+                    <option value="">選擇辯論題目</option>
+                    <option value="cancel-entrance-exam">是否應該取消大學入學考試？</option>
+                    <option value="ban-smoking">是否應在所有公共場所全面禁煙？</option>
+                    <option value="higher-taxes-for-rich">是否應該對富人徵收更高的稅率？</option>
+                    <option value="same-sex-marriage">是否應該支持同性婚姻？</option>
+                    <option value="abolish-death-penalty">是否應該廢除死刑？</option>
+                    <option value="global-education-system">是否應該在全球範圍內實施統一的教育制度？</option>
+                    <option value="social-media-regulation">是否應該對社群媒體平台上的內容進行更嚴格的監管？</option>
+                    <option value="gene-editing">是否應該允許基因編輯技術用於人類胚胎？</option>
+                    <option value="universal-basic-income">是否應該實施全民基本收入？</option>
+                    <option value="penalties-for-polluters">是否應該對環境污染企業施加更重的罰款？</option>
+                </select>
+            </section>
+        </main>
+        <footer>
+            <a href="/debate-form" class="action-btn debate-btn">加入投票或辯論</a>
+            <a href="/register-form" class="action-btn register-btn">註冊</a>
+            <a href="/login-form" class="action-btn login-btn">登入</a>
+        </footer>
+    </div>
+    <script src="/static/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+venv
+*.log
+*.txt
+*.png
+*.jpg
