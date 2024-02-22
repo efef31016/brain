@@ -17,15 +17,7 @@ class RegisterService:
         return 
     
     def register(self, snick, pwd, email, verify):
-        print(snick)
-        # 驗證使用者名稱
-        if not re.match(r'^[a-zA-Z0-9_\u4e00-\u9fff]{1,20}$', snick):
-            raise HTTPException(status_code=400, detail="Invalid username. Username should be 3-20 characters long and can contain letters, numbers, and underscores.")
-    
-        # 驗證密碼長度
-        if len(pwd) < 8:
-            raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
-        
+
         # 驗證電子信箱
         if not self.redis_session_op.redis_config.find_a_set(email):
             raise HTTPException(status_code=400, detail="Please verify your email.")
@@ -42,8 +34,8 @@ class RegisterService:
         # 儲存使用者資訊到 Neo4j
         try:
             self.neo4j_user_op.save_user(snick, email, hashed_password, person_uuid, token=invited_token, verify=verify)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to save user: {e}")
+        except:
+            raise HTTPException(status_code=400, detail = "用戶資料儲存失敗")
    
         return {"new_verify_code": invited_token}
 
@@ -51,9 +43,9 @@ class RegisterService:
         # 邀請碼使用次數檢查
         usage_count = self.redis_session_op.redis_config.get_value("verify_usage:" + verify)
         if usage_count is None:
-            raise HTTPException(status_code=400, detail="Verification code not found.")
+            raise HTTPException(status_code=400, detail="邀請碼不存在.")
         if int(usage_count) >= 5:
-            raise HTTPException(status_code=400, detail="Verification code has been used too many times.")
+            raise HTTPException(status_code=400, detail="邀請碼無法使用(原因: 超過使用次數)")
         # 更新邀請碼使用次屬
         self.redis_session_op.redis_config.r.hincrby("verify_usage", verify, 1)
 

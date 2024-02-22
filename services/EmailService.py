@@ -5,15 +5,22 @@ from email.mime.text import MIMEText
 from fastapi import HTTPException
 
 class EmailService:
-     def __init__(self, redis_session_op, sender_email, sender_password):
+     def __init__(self, neo4j_user_op, redis_session_op, sender_email, sender_password):
+        self.neo4j_user_op = neo4j_user_op
         self.redis_session_op = redis_session_op
         self.sender_email = sender_email
         self.sender_password = sender_password
 
      def generate_and_save_verification_code(self, email):
 
+        query = "MATCH (n {email: $email}) RETURN n LIMIT 1"
+        parameters = {"email": email}
+        result = self.neo4j_user_op.neo4j_config.run_query(query, parameters)
+        if len(result) > 0:
+            raise HTTPException(status_code=400, detail="此信箱已被註冊")
+
         if self.redis_session_op.redis_config.find_a_set(email):
-            raise HTTPException(status_code=400, detail="Invalid email. This email has already been registered")
+            raise HTTPException(status_code=400, detail="此信箱已認證，請直接跳過驗證步驟")
         
         verification_code = secrets.token_urlsafe()
         # 過期時間 10 分鐘

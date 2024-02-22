@@ -94,3 +94,34 @@ body {
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+/* 通知容器樣式 */
+.notification {
+    position: fixed;
+    top: 20px; /* 在頂部顯示，距離上邊界20px */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 300px; /* 最小寬度 */
+    max-width: 80%; /* 最大寬度，確保在小螢幕上也能良好顯示 */
+    background-color: #323232; /* 預設背景色 */
+    color: white; /* 文字顏色 */
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    z-index: 1000;
+    opacity: 1; /* 預設完全不透明 */
+    transition: opacity 0.5s ease-out, top 0.5s ease-out; /* 平滑過渡效果 */
+}
+
+/* 成功訊息的背景色 */
+.notification-success {
+    background-color: #4CAF50; /* 綠色 */
+}
+
+/* 錯誤訊息的背景色 */
+.notification-error {
+    background-color: #F44336; /* 紅色 */
+}

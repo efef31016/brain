@@ -23,6 +23,6 @@ neo4j_user_op = Neo4jUserOperation(neo4j_config)
 redis_session_op = RedisSessionOperation(redis_config)
 
 # 服務實例化，確保傳遞正確的依賴項
-email_service = EmailService(redis_session_op, sender_email, sender_password)
+email_service = EmailService(neo4j_user_op, redis_session_op, sender_email, sender_password)
 register_service = RegisterService(neo4j_user_op, redis_session_op)
 vote_counts_service = VoteCountsService(redis_session_op)

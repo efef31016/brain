@@ -18,18 +18,18 @@ document.getElementById('send-verify-email-btn').addEventListener('click', funct
             return response.json();
         })
         .then(data => {
-            alert(data.message); // 顯示成功訊息
+            showNotification(data.message); // 顯示成功訊息
             document.getElementById('send-verify-email-btn').style.display = 'none';
             document.getElementById('verification-container').style.display = 'block';
         })
         .catch(error => {
             console.error('Error:', error);
-            showError(error); // 使用showError顯示錯誤
+            showNotification(error); // 使用showNotification顯示錯誤
             this.disabled = false; // 請求失敗後啟用按鈕
             this.textContent = '發送電子郵件';
         });
     } else {
-        showError('請輸入有效的電子郵件地址。'); // 使用showError顯示錯誤
+        showNotification('請輸入有效的電子郵件地址。'); // 使用showNotification顯示錯誤
     }
 });
 
@@ -51,82 +51,129 @@ document.getElementById('verify-email-btn').addEventListener('click', function()
             return response.json();
         })
         .then(data => {
-            alert(data.message); // 顯示成功訊息
+            showNotification(data.message); // 顯示成功訊息
             document.getElementById('verify-email-btn').disabled = true;
             document.getElementById('email-verified-icon').style.display = 'inline';
         })
         .catch(error => {
             console.error('Error:', error);
-            showError(error); // 使用showError顯示錯誤
+            showNotification(error); // 使用showNotification顯示錯誤
         });
     } else {
-        showError('請輸入驗證碼。'); // 使用showError顯示錯誤
+        showNotification('請輸入驗證碼。'); // 使用showNotification顯示錯誤
     }
 });
 
 
+
 // 按下提交表單
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('verification-code').required = false;
-    document.getElementById("main-form").addEventListener("submit", function(event) {
+    const formElement = document.getElementById('main-form');
+    const errorContainer = document.getElementById('error-message');
+
+    // 前端驗證規則
+    const rules = [
+        {
+            field: 'snick',
+            test: (value) => /^[a-zA-Z0-9_\u4e00-\u9fff]{3,20}$/.test(value),
+            message: 'Invalid username. Username should be 3-20 characters long and can contain letters, numbers, and underscores.',
+        },
+        {
+            field: 'pwd',
+            test: (value) => value.length >= 8,
+            message: 'Password must be at least 8 characters long.',
+        },
+        {
+            field: 'confirm-pwd',
+            test: (value) => {
+                const password = document.getElementById('pwd').value;
+                return password === value;
+            },
+            message: 'Passwords do not match.',
+        }
+    ];
+
+    formElement.addEventListener("submit", function(event) {
         event.preventDefault(); // 阻止表單的預設提交行為
 
-        let formData = new FormData(this);
+        // 清除先前的錯誤訊息
+        errorContainer.style.display = 'none';
 
-        // 使用Fetch API傳送數據
+        // 執行前端驗證
+        const validationResult = validateForm(this, rules);
+        if (!validationResult.isValid) {
+            showNotification(validationResult.errors.join('. '));
+            return;
+        }
+
+        // 如果前端驗證通過，則處理表單提交
+        let formData = new FormData(this);
+        console.log(this);
         fetch("/api/register-submit-form", {
             method: "POST",
             body: formData
         })
-        .then(response => {
-            if (!response.ok) {
-                // 如果HTTP狀態碼不是2xx，則嘗試解析JSON以取得錯誤訊息
-                return response.json().then(data => {
-                    // 如果能夠解析錯誤訊息，則拋出自定義的錯誤對象
-                    throw {isApiError: true, data: data};
-                }, () => {
-                    // 如果解析JSON失敗，則拋出通用錯誤
-                    throw {isApiError: true, message: 'An error occurred. Please try again.'};
-                });
-            }
-            if (response.redirected) {
-                window.location.href = response.url;
-                return Promise.reject({isApiError: false, message: 'Redirected'}); // 避免後續的then處理邏輯
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.error) {
-                // 顯示錯誤訊息
-                showError(data.error);
-            } else {
-                // 處理成功邏輯
-                window.location.href = "/"; // 或顯示成功訊息
-            }
-        })
-        .catch(error => {
-            // 這裡根據錯誤類型決定處理方式
-            if (error.isApiError) {
-                // 顯示來自API的錯誤訊息
-                showError(error.data ? error.data.error : error.message);
-            } else {
-                // JavaScript錯誤只在控制台顯示
-                console.error('JS Error:', error.message);
-            }
-        });
+        .then(handleResponse)
+        .catch(handleError);
     });
+
+    // 處理響應
+    async function handleResponse(response) {
+        const data = await response.json();
+        if (!response.ok) {
+            throw {isApiError: true, data: data};
+        }
+        showNotification(data.message, true);
+        await delay(2000);
+        window.location.href = '/';
+    }
+
+    // 失敗
+    function handleError(error) {
+        let message = "An error occurred. Please try again.";
+        if (error.isApiError && error.data && error.data.error) {
+            message = error.data.error;
+        } else if (error.message) {
+            message = error.message;
+        }
+        showNotification(message, false); // 顯示錯誤訊息
+   }
 });
 
-function showError(message) {
-    const errorMessageDiv = document.getElementById("error-message");
-    errorMessageDiv.textContent = message;
-    errorMessageDiv.style.display = "block";
-    // 重置樣式以重新開始動畫，如果之前已經淡出
-    errorMessageDiv.style.opacity = "1";
-    setTimeout(() => {
-        errorMessageDiv.style.opacity = "0";
-        setTimeout(() => {
-            errorMessageDiv.style.display = "none";
-        }, 500); // 確保這個時間與CSS中的transition時間相符
-    }, 5000); // 5秒後開始淡出
+function validateForm(form, rules) {
+    const result = {
+        isValid: true,
+        errors: [],
+    };
+
+    rules.forEach(rule => {
+        const { field, test, message } = rule;
+        const value = form.querySelector(`[name=${field}]`).value;
+
+        if (!test(value)) {
+            result.isValid = false;
+            result.errors.push(message);
+        }
+    });
+
+    return result;
 }
+  
+function showNotification(message, isSuccess = false) {
+    const notification = document.createElement("div");
+    notification.className = `notification ${isSuccess ? 'notification-success' : 'notification-error'}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.opacity = "0";
+        notification.style.top = "10px"; // 建立一個向上移動淡出的效果
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 500); // 這裡的時間應與CSS中的transition時間相符
+    }, 3000); // 3秒後開始淡出
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }

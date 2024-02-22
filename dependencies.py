@@ -11,8 +11,6 @@ def get_register_service():
 def get_vote_counts_service():
     return vote_counts_service
 
-
-
 # def get_auth_service():
 #     return AuthService(user_db_op, redis_session_op)
 
