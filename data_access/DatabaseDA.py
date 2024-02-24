@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from models.User import User
+from models.UserModel import User
 from config.DatabaseConfig import Neo4jConfig, RedisConfig
 import uuid
 
@@ -33,9 +33,16 @@ class Neo4jUserOperation(DatabaseOperation):
         """
         self.neo4j_config.run_query(create_relation_query, parameters={"verify": verify, "uuid": person_uuid})
 
-    def find_user(self, username):
-        query = "MATCH (u:User {username: $username}) RETURN u"
-        parameters = {"username": username}
+    def find_user(self, login_identifier):
+        """
+        尋找用戶，login_identifier 可以是用戶名或電子郵件。
+        """
+        query = """
+        MATCH (u:User)
+        WHERE u.username = $login_identifier OR u.email = $login_identifier
+        RETURN u
+        """
+        parameters = {"login_identifier": login_identifier}
         result = self.neo4j_config.run_query(query, parameters)
         return result
 

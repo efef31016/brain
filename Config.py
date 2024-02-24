@@ -2,6 +2,7 @@
 from config.DatabaseConfig import Neo4jConfig
 from config.DatabaseConfig import RedisConfig
 from services.RegisterService import RegisterService
+from services.LoginService import LoginService
 from services.VoteCountsService import VoteCountsService
 from services.EmailService import EmailService
 from data_access.DatabaseDA import Neo4jUserOperation
@@ -26,3 +27,4 @@ redis_session_op = RedisSessionOperation(redis_config)
 email_service = EmailService(neo4j_user_op, redis_session_op, sender_email, sender_password)
 register_service = RegisterService(neo4j_user_op, redis_session_op)
 vote_counts_service = VoteCountsService(redis_session_op)
+login_service = LoginService(neo4j_user_op)

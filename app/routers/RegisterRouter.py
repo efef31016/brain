@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Depends, Form, HTTPException, status
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from dependencies import get_register_service, get_email_service
 from schemas.EmailSchema import EmailSchema
@@ -28,7 +28,7 @@ async def send_verification_email(email_data: EmailSchema, email_service=Depends
     return JSONResponse(status_code=status.HTTP_201_CREATED, content={"message": "驗證信箱已寄出"})
 
 @router.post("/api/verify-email-code")
-async def verify_email_code(request: VerifyEmailRequest, email_service=Depends(get_email_service)):
+async def verify_email(request: VerifyEmailRequest, email_service=Depends(get_email_service)):
     if email_service.verify_email_code(request.email, request.code):
         success_msg = "電子信箱通過驗證"
         return JSONResponse(status_code=status.HTTP_201_CREATED, content={"message": success_msg})
