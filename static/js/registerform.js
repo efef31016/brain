@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailInput = document.getElementById('email');
     const verificationCodeInput = document.getElementById('verification-code');
     const overlay = document.getElementById('overlay');
-
+    
     // 前端驗證規則
     const rules = [
         {
@@ -137,6 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 showNotification(data.message, true); // 顯示成功訊息
+                document.getElementById('email-verified-icon').textContent = '...';
+                document.getElementById('email-verified-icon').style.color = 'orange';
                 document.getElementById('send-verify-email-btn').style.display = 'none';
                 document.getElementById('verification-container').style.display = 'block';
             })
@@ -170,8 +172,9 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 showNotification(data.message, true); // 顯示成功訊息
+                document.getElementById('email-verified-icon').textContent = '✔';
+                document.getElementById('email-verified-icon').style.color = 'green';
                 document.getElementById('verify-email-btn').disabled = true;
-                document.getElementById('email-verified-icon').style.display = 'inline';
             })
             .catch(error => {
                 showNotification(error, true); // 使用showNotification顯示錯誤
