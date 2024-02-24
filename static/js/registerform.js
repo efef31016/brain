@@ -1,114 +1,73 @@
-document.getElementById('send-verify-email-btn').addEventListener('click', function() {
-    var email = document.getElementById('email').value;
-    if (email) {
-        // 顯示載入提示
-        this.textContent = '發送...';
-        this.disabled = true; // 停用按鈕
-        fetch('/api/send-verification-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => Promise.reject(data.error));
-            }
-            return response.json();
-        })
-        .then(data => {
-            showNotification(data.message); // 顯示成功訊息
-            document.getElementById('send-verify-email-btn').style.display = 'none';
-            document.getElementById('verification-container').style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification(error); // 使用showNotification顯示錯誤
-            this.disabled = false; // 請求失敗後啟用按鈕
-            this.textContent = '發送電子郵件';
-        });
-    } else {
-        showNotification('請輸入有效的電子郵件地址。'); // 使用showNotification顯示錯誤
-    }
-});
-
-document.getElementById('verify-email-btn').addEventListener('click', function() {
-    var email = document.getElementById('email').value;
-    var code = document.getElementById('verification-code').value;
-    if (code) {
-        fetch('/api/verify-email-code', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email, code: code })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => Promise.reject(data.message));
-            }
-            return response.json();
-        })
-        .then(data => {
-            showNotification(data.message); // 顯示成功訊息
-            document.getElementById('verify-email-btn').disabled = true;
-            document.getElementById('email-verified-icon').style.display = 'inline';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification(error); // 使用showNotification顯示錯誤
-        });
-    } else {
-        showNotification('請輸入驗證碼。'); // 使用showNotification顯示錯誤
-    }
-});
-
-
-
-// 按下提交表單
 document.addEventListener('DOMContentLoaded', function() {
     const formElement = document.getElementById('main-form');
-    const errorContainer = document.getElementById('error-message');
+    const emailButton = document.getElementById('send-verify-email-btn');
+    const verifyButton = document.getElementById('verify-email-btn');
+    const emailInput = document.getElementById('email');
+    const verificationCodeInput = document.getElementById('verification-code');
+    const overlay = document.getElementById('overlay');
 
     // 前端驗證規則
     const rules = [
         {
             field: 'snick',
-            test: (value) => /^[a-zA-Z0-9_\u4e00-\u9fff]{3,20}$/.test(value),
-            message: 'Invalid username. Username should be 3-20 characters long and can contain letters, numbers, and underscores.',
+            test: value => /^[a-zA-Z0-9_\u4e00-\u9fff]{1,20}$/.test(value),
+            message: '使用者名稱僅支援1-20位的字母、數字、底線和中文字元。',
         },
         {
             field: 'pwd',
-            test: (value) => value.length >= 8,
-            message: 'Password must be at least 8 characters long.',
+            test: value => value.length >= 8,
+            message: '密碼需超過8位數。',
         },
         {
             field: 'confirm-pwd',
-            test: (value) => {
-                const password = document.getElementById('pwd').value;
-                return password === value;
-            },
-            message: 'Passwords do not match.',
+            test: value => document.getElementById('pwd').value === value,
+            message: '確認密碼必須與密碼相等。',
+        },
+        {
+            field: 'email',
+            test: value => /\S+@\S+\.\S+/.test(value),
+            message: '電子信箱必須填有效格式。',
         }
     ];
 
-    formElement.addEventListener("submit", function(event) {
-        event.preventDefault(); // 阻止表單的預設提交行為
+    // 綁定即時驗證邏輯
+    rules.forEach(({field, test, message}) => {
+        const inputElement = formElement.querySelector(`[name=${field}]`);
+        inputElement.addEventListener('input', () => validateField(inputElement, {test, message}));
+    });
 
-        // 清除先前的錯誤訊息
-        errorContainer.style.display = 'none';
+    function validateField(inputElement, {test, message}, showNotificationNow = true) {
+        const isValid = test(inputElement.value);
+        inputElement.classList.toggle('error', !isValid);
+        if (!isValid && showNotificationNow) {
+            showNotification(message, false);
+        }
+        return isValid;
+    }
 
-        // 執行前端驗證
-        const validationResult = validateForm(this, rules);
-        if (!validationResult.isValid) {
-            showNotification(validationResult.errors.join('. '));
+    function validateForm() {
+        const isFormValid = rules.every(({field, test, message}) =>
+            validateField(formElement.querySelector(`[name=${field}]`), {test, message}, false)
+        );
+    
+        if (!isFormValid) {
+            showNotification('請檢查輸入格式是否錯誤', false);
+        }
+    
+        return isFormValid;
+    }
+
+    // 提交表單
+    formElement.addEventListener("submit", async function(event) {
+        event.preventDefault();
+        if (!validateForm()) {
             return;
         }
 
-        // 如果前端驗證通過，則處理表單提交
+        overlay.style.display = 'flex';
+
+        // 如果前端驗證通過，則處理後端驗證邏輯
         let formData = new FormData(this);
-        console.log(this);
         fetch("/api/register-submit-form", {
             method: "POST",
             body: formData
@@ -117,63 +76,137 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(handleError);
     });
 
-    // 處理響應
+    // 負責處理伺服器成功傳回的回應（包括處理業務邏輯錯誤，即雖然請求成功，但業務邏輯上存在錯誤）
     async function handleResponse(response) {
-        const data = await response.json();
-        if (!response.ok) {
-            throw {isApiError: true, data: data};
+        try {
+            const data = await response.json();
+            if (!response.ok) {
+                throw {isApiError: true, message: data.message};
+            }
+            await delay(1500);
+            overlay.style.display = 'none';
+            showNotification(data.message, true);
+            await delay(1500);
+            window.location.href = '/';
+        } catch (error) {
+            throw {isApiError: true, message: error.message || "Error processing response."};
         }
-        showNotification(data.message, true);
-        await delay(2000);
-        window.location.href = '/';
     }
-
-    // 失敗
-    function handleError(error) {
+    
+    // 負責處理請求過程中遇到的異常情況，例如網路錯誤、請求配置錯誤等，以及由 handleResponse 拋出的業務邏輯錯誤
+    async function handleError(error) {
         let message = "An error occurred. Please try again.";
-        if (error.isApiError && error.data && error.data.error) {
-            message = error.data.error;
-        } else if (error.message) {
+        if (error.isApiError && error.message) {
             message = error.message;
         }
-        showNotification(message, false); // 顯示錯誤訊息
-   }
-});
+        await delay(1000);
+        overlay.style.display = 'none';
+        showNotification(message, false);
+    }
 
-function validateForm(form, rules) {
-    const result = {
-        isValid: true,
-        errors: [],
-    };
-
-    rules.forEach(rule => {
-        const { field, test, message } = rule;
-        const value = form.querySelector(`[name=${field}]`).value;
-
-        if (!test(value)) {
-            result.isValid = false;
-            result.errors.push(message);
-        }
+    emailButton.addEventListener('click', function() {
+        sendEmailVerification(emailInput.value);
     });
 
-    return result;
-}
-  
-function showNotification(message, isSuccess = false) {
-    const notification = document.createElement("div");
-    notification.className = `notification ${isSuccess ? 'notification-success' : 'notification-error'}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
+    verifyButton.addEventListener('click', function() {
+        verifyEmailCode(emailInput.value, verificationCodeInput.value);
+    });
 
-    setTimeout(() => {
-        notification.style.opacity = "0";
-        notification.style.top = "10px"; // 建立一個向上移動淡出的效果
+    async function sendEmailVerification(email) {
+        if (!validateField(emailInput, rules.find(rule => rule.field === 'email'))) {
+            showNotification('請輸入有效的電子郵件地址。', false);
+            return;
+        }
+        var email = document.getElementById('email').value;
+        if (email) {
+            // 顯示載入提示
+            this.textContent = '發送...';
+            this.disabled = true; // 停用按鈕
+            fetch('/api/send-verification-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => Promise.reject(data.message));
+                }
+                return response.json();
+            })
+            .then(data => {
+                showNotification(data.message, true); // 顯示成功訊息
+                document.getElementById('send-verify-email-btn').style.display = 'none';
+                document.getElementById('verification-container').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification(error); // 使用showNotification顯示錯誤
+                this.disabled = false; // 請求失敗後啟用按鈕
+                this.textContent = '發送電子郵件';
+            });
+        } else {
+            showNotification('請輸入有效的電子郵件地址。'); // 使用showNotification顯示錯誤
+        }
+    }
+
+    async function verifyEmailCode(email, code) {
+        var email = document.getElementById('email').value;
+        var code = document.getElementById('verification-code').value;
+        if (code) {
+            fetch('/api/verify-email-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email, code: code })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => Promise.reject(data.message));
+                }
+                return response.json();
+            })
+            .then(data => {
+                showNotification(data.message, true); // 顯示成功訊息
+                document.getElementById('verify-email-btn').disabled = true;
+                document.getElementById('email-verified-icon').style.display = 'inline';
+            })
+            .catch(error => {
+                showNotification(error, true); // 使用showNotification顯示錯誤
+            });
+        } else {
+            showNotification('請輸入驗證碼。'); // 使用showNotification顯示錯誤
+        }
+    }
+
+    // 顯示通知
+    function showNotification(message, isSuccess) {
+        // 首先移除已存在的通知
+        document.querySelectorAll('.notification').forEach(notification => {
+            notification.remove();
+        });
+    
+ 
+        const notification = document.createElement("div");
+        notification.className = `notification ${isSuccess ? 'notification-success' : 'notification-error'}`;
+        notification.textContent = message;
+        notification.style.opacity = "1";
+        notification.style.transition = "opacity 0.5s ease";
+    
+        document.body.appendChild(notification);
+    
         setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 500); // 這裡的時間應與CSS中的transition時間相符
-    }, 3000); // 3秒後開始淡出
-}
+            notification.style.opacity = "0";
+            notification.addEventListener('transitionend', () => {
+                notification.remove();
+            });
+        }, 3000);
+    }
 
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+    // 停頓
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+});

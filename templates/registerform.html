@@ -6,10 +6,13 @@
     <link rel="stylesheet" href="/static/css/registerform.css">
 </head>
 <body>
+    <div id="overlay" style="display:none;">
+        <div id="loadingMessage">創建用戶中...</div>
+    </div>
     <div id="error-message" style="display:none;"></div>
     <form id="main-form" action="/api/register-submit-form" method="post">
         <div class="form-group">
-            <label for="snick">綽號:</label>
+            <label for="snick">使用者名稱:</label>
             <input type="text" id="snick" name="snick" required>
         </div>
 
