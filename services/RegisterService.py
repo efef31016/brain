@@ -1,6 +1,6 @@
 import re
 import uuid
-import hashlib
+from AuthService import ph
 from fastapi import HTTPException
 
 class RegisterService:
@@ -11,7 +11,8 @@ class RegisterService:
 
     def _generate_initial_verify_code(self):
         # 初始邀請碼
-        initial_code = hashlib.sha256("FakeIssue".encode('utf-8')).hexdigest()
+        init_token = "FakeIssue"
+        initial_code = ph.hash(init_token)
         # 使用 redis_session_op 初始化第一代邀請碼使用次數
         self.redis_session_op.redis_config.set_value("verify_usage:" + initial_code, 0) 
         return 
@@ -21,6 +22,7 @@ class RegisterService:
         # 驗證帳號
         if not re.match(r'^[a-zA-Z0-9_\u4e00-\u9fff]{1,20}$', snick):
             raise HTTPException(status_code=400, detail="使用者名稱僅支援1-20位的字母、數字、底線和中文字元。")
+        
         # 驗證密碼
         if len(pwd) < 8:
             raise HTTPException(status_code=400, detail="密碼需超過8位數。")
@@ -39,7 +41,7 @@ class RegisterService:
         self._validate_token(verify)
     
         # 加密密碼
-        hashed_password = hashlib.sha256(pwd.encode()).hexdigest()
+        hashed_password = ph.hash(pwd)
     
         # 為新用戶設定新的邀請碼和使用次數
         person_uuid, invited_token = self._generate_uuid_and_token()
@@ -65,7 +67,7 @@ class RegisterService:
 
     def _generate_uuid_and_token(self):
         person_uuid = str(uuid.uuid4())
-        token = hashlib.sha256(person_uuid.encode('utf-8')).hexdigest()
+        token = ph.hash(person_uuid)
         # 初始化新 token 的使用次數
         self.redis_session_op.redis_config.set_value("verify_usage:" + token, 0)
         return person_uuid, token
