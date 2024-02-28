@@ -1,6 +1,7 @@
 # https://developer.redis.com/create/windows/
 from neo4j import GraphDatabase
 import redis
+import psycopg2
 
 class Neo4jConfig:
     def __init__(self, uri, user, password):
@@ -33,7 +34,12 @@ class RedisConfig:
     def find_a_set(self, value):
         return self.r.sismember("verified_emails", value)
 
+class PostgreSQLConfig:
+    def __init__(self, dbname, user, password, host='localhost'):
+        self.connection_string = f"dbname='{dbname}' user='{user}' password='{password}' host='{host}'"
 
+    def get_connection(self):
+        return psycopg2.connect(self.connection_string)
 
 if __name__ == "__main__":
     from datetime import timedelta
@@ -54,3 +60,5 @@ if __name__ == "__main__":
 
     # expiration_duration = timedelta(minutes=30)
     # redis_config.set_value_with_expiration("token123", "user@example.com", expiration_duration)
+
+
