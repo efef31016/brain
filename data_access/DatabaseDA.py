@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from models.UserModel import User
 from config.DatabaseConfig import Neo4jConfig, RedisConfig, PostgreSQLConfig
+from psycopg2.extras import RealDictCursor
 import uuid
 
 class DatabaseOperation(ABC):
@@ -14,17 +15,19 @@ class DatabaseOperation(ABC):
 
 class Neo4jUserOperation(DatabaseOperation):
     def __init__(self, neo4j_config: Neo4jConfig):
+        '''
+        使用 Cypher 加入constraint: CREATE CONSTRAINT user_uuid_unique FOR (u:User) REQUIRE u.uuid IS UNIQUE;
+        '''
         self.neo4j_config = neo4j_config
 
-    def save_user(self, username, email, password, person_uuid, token, verify):
+    def save_user(self, person_uuid, token, verify):
         # 建立用戶節點
         create_user_query = """
-        CREATE (u:User {uuid: $uuid, username: $username, email: $email, password: $password, token: $token})
+        CREATE (u:User {uuid: $uuid, token: $token})
         RETURN u
         """
         self.neo4j_config.run_query(create_user_query, parameters={
-            "uuid": person_uuid, "username": username, "email": email, 
-            "password": password, "token": token})
+            "uuid": person_uuid, "token": token})
 
         # 建立連結
         create_relation_query = """
@@ -33,16 +36,13 @@ class Neo4jUserOperation(DatabaseOperation):
         """
         self.neo4j_config.run_query(create_relation_query, parameters={"verify": verify, "uuid": person_uuid})
 
-    def find_user(self, login_identifier):
-        """
-        尋找用戶，login_identifier 可以是用戶名或電子郵件。
-        """
+    def find_user(self, uuid):
         query = """
         MATCH (u:User)
-        WHERE u.username = $login_identifier OR u.email = $login_identifier
+        WHERE u.uuid = $uuid
         RETURN u
         """
-        parameters = {"login_identifier": login_identifier}
+        parameters = {"uuid": uuid}
         result = self.neo4j_config.run_query(query, parameters)
         return result
 
@@ -71,8 +71,8 @@ class PostgresqlUserOperation:
 
         # 插入使用者資訊
         cursor.execute("""
-            INSERT INTO users (uuid, username, email, password)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO \"user\".users (user_id, user_name, email, password)
+            VALUES (%s, %s, %s, %s)
         """, (person_uuid, username, email, password))
 
         conn.commit()
@@ -81,11 +81,12 @@ class PostgresqlUserOperation:
 
     def find_user(self, login_identifier):
         conn = self.db_config.get_connection()
-        cursor = conn.cursor()
+        # 使用 RealDictCursor
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute("""
-            SELECT * FROM users
-            WHERE username = %s OR email = %s
+            SELECT * FROM \"user\".users
+            WHERE user_name = %s OR email = %s
         """, (login_identifier, login_identifier))
 
         user = cursor.fetchone()

@@ -1,12 +1,19 @@
+from services.AuthService import AuthService
+from typing import Dict
+
 class LogoutService:
-    def __init__(self, neo4j_user_op):
-        self.neo4j_user_op = neo4j_user_op
+    def __init__(self, postgresql_user_op):
+        self.auth = AuthService(postgresql_user_op)
 
-    def add_token_to_user_blacklist(self, user_id, token):
-
-        check_token_query = """
-        MATCH (u:User {uuid: $user_id})
-        RETURN u.blacklistedToken = $token AS isBlacklisted
-        """
-        result = self.neo4j_user_op.neo4j_config.run_query(check_token_query, parameters={"user_id": user_id, "token": token})
-        return result[0]["isBlacklisted"] if result else False
+    def logout(self, user_id: str, token: str, device_id: str) -> Dict[str, str]:
+        try:
+            self.auth.add_token_to_blacklist(user_id, token, device_id)
+            return {
+                "status": "success",
+                "message": "您已成功登出。"
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"登出失敗：{e}"
+            }

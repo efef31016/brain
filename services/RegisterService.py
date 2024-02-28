@@ -4,10 +4,11 @@ from services.AuthService import ph
 from fastapi import HTTPException
 
 class RegisterService:
-    def __init__(self, neo4j_user_op, redis_session_op):
+    def __init__(self, neo4j_user_op, postgresql_user_op, redis_session_op):
         self.neo4j_user_op = neo4j_user_op
+        self.postgresql_user_op = postgresql_user_op
         self.redis_session_op = redis_session_op
-        self.initial_verify_code = self._generate_initial_verify_code()
+        self.initial_verify_code = None
 
     def _generate_initial_verify_code(self):
         # 初始邀請碼
@@ -15,7 +16,7 @@ class RegisterService:
         initial_code = ph.hash(init_token)
         # 使用 redis_session_op 初始化第一代邀請碼使用次數
         self.redis_session_op.redis_config.set_value("verify_usage:" + initial_code, 0) 
-        return 
+        return
     
     def register(self, snick, pwd, email, verify):
 
@@ -31,9 +32,8 @@ class RegisterService:
         if not self.redis_session_op.redis_config.find_a_set(email):
             raise HTTPException(status_code=400, detail="請認證電子信箱。")
         
-        query = "MATCH (n {email: $email}) RETURN n LIMIT 1"
-        parameters = {"email": email}
-        result = self.neo4j_user_op.neo4j_config.run_query(query, parameters)
+        sql = "SELECT * FROM \"user\".users WHERE email = %s LIMIT 1;"
+        result = self.postgresql_user_op.db_config.select(sql, (email,))
         if len(result) > 0:
             raise HTTPException(status_code=400, detail="此信箱已被註冊")
 
@@ -46,12 +46,14 @@ class RegisterService:
         # 為新用戶設定新的邀請碼和使用次數
         person_uuid, invited_token = self._generate_uuid_and_token()
     
-        # 儲存使用者資訊到 Neo4j
+        # 儲存使用者資訊到 Neo4j 和 PostgreSQL
         try:
-            self.neo4j_user_op.save_user(snick, email, hashed_password, person_uuid, token=invited_token, verify=verify)
+            self.postgresql_user_op.save_user(username=snick, email=email, password=hashed_password, person_uuid=person_uuid)
+
+            self.neo4j_user_op.save_user(person_uuid, token=invited_token, verify=verify)
             self.redis_session_op.redis_config.set_value("verify_usage:" + verify, 1)
-        except:
-            raise HTTPException(status_code=400, detail = "用戶資料儲存失敗")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail = f'用戶資料儲存失敗: {e}')
    
         return {"new_verify_code": invited_token}
 

@@ -2,6 +2,7 @@
 from neo4j import GraphDatabase
 import redis
 import psycopg2
+from contextlib import closing
 
 class Neo4jConfig:
     def __init__(self, uri, user, password):
@@ -40,6 +41,23 @@ class PostgreSQLConfig:
 
     def get_connection(self):
         return psycopg2.connect(self.connection_string)
+
+    def select(self, query, parameters=None):
+        with closing(self.get_connection()) as conn, conn.cursor() as cur:
+            cur.execute(query, parameters or ())
+            return cur.fetchall()
+
+    def insert(self, query, parameters):
+        with closing(self.get_connection()) as conn, conn.cursor() as cur:
+            cur.execute(query, parameters)
+            conn.commit()
+            return cur.rowcount
+
+    def update(self, query, parameters):
+        return self.insert(query, parameters)
+
+    def delete(self, query, parameters):
+        return self.insert(query, parameters)
 
 if __name__ == "__main__":
     from datetime import timedelta

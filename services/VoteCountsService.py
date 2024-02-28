@@ -1,5 +1,6 @@
 class VoteCountsService:
-     def __init__(self, redis_operation):
+     def __init__(self, postgresql_user_op, redis_operation):
+         self.postgresql_user_op = postgresql_user_op
          self.redis_operation = redis_operation
 
      def user_counts(self):

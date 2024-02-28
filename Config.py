@@ -25,8 +25,8 @@ redis_session_op = RedisSessionOperation(redis_config)
 postgresql_user_op = PostgresqlUserOperation(postgresql_config)
 
 # 服務實例化，確保傳遞正確的依賴項
-email_service = EmailService(neo4j_user_op, redis_session_op, sender_email, sender_password)
-register_service = RegisterService(neo4j_user_op, redis_session_op)
-vote_counts_service = VoteCountsService(redis_session_op)
-login_service = LoginService(neo4j_user_op)
-logout_service = LogoutService(neo4j_user_op)
+email_service = EmailService(postgresql_user_op, redis_session_op, sender_email, sender_password)
+register_service = RegisterService(neo4j_user_op, postgresql_user_op, redis_session_op)
+vote_counts_service = VoteCountsService(redis_session_op, postgresql_user_op)
+login_service = LoginService(postgresql_user_op)
+logout_service = LogoutService(postgresql_user_op)

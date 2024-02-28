@@ -5,17 +5,16 @@ from email.mime.text import MIMEText
 from fastapi import HTTPException
 
 class EmailService:
-     def __init__(self, neo4j_user_op, redis_session_op, sender_email, sender_password):
-        self.neo4j_user_op = neo4j_user_op
+     def __init__(self, postgresql_user_op, redis_session_op, sender_email, sender_password):
+        self.postgresql_user_op = postgresql_user_op
         self.redis_session_op = redis_session_op
         self.sender_email = sender_email
         self.sender_password = sender_password
 
      def generate_and_save_verification_code(self, email):
 
-        query = "MATCH (n {email: $email}) RETURN n LIMIT 1"
-        parameters = {"email": email}
-        result = self.neo4j_user_op.neo4j_config.run_query(query, parameters)
+        sql = "SELECT * FROM \"user\".users WHERE email = %s LIMIT 1;"
+        result = self.postgresql_user_op.db_config.select(sql, (email,))
         if len(result) > 0:
             raise HTTPException(status_code=400, detail="此信箱已被註冊")
 
