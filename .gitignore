@@ -4,3 +4,4 @@ venv
 *.png
 *.jpg
 .env*
+*.pyc
