@@ -45,6 +45,27 @@ class Neo4jUserOperation(DatabaseOperation):
         parameters = {"login_identifier": login_identifier}
         result = self.neo4j_config.run_query(query, parameters)
         return result
+    
+    def add_token_to_blacklist(self, token):
+        """
+        將JWT令牌加入到黑名單。
+        """
+        add_token_query = """
+        CREATE (b:Blacklist {token: $token})
+        RETURN b
+        """
+        self.neo4j_config.run_query(add_token_query, parameters={"token": token})
+
+    def check_token_blacklist(self, token):
+        """
+        檢查JWT令牌是否在黑名單中。
+        """
+        check_token_query = """
+        MATCH (b:Blacklist {token: $token})
+        RETURN b
+        """
+        result = self.neo4j_config.run_query(check_token_query, parameters={"token": token})
+        return len(result) > 0
 
 class RedisSessionOperation:
     def __init__(self, redis_config: RedisConfig):

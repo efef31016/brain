@@ -1,6 +1,6 @@
 import re
 import uuid
-from AuthService import ph
+from services.AuthService import ph
 from fastapi import HTTPException
 
 class RegisterService:

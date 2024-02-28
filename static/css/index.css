@@ -112,3 +112,83 @@ footer {
      padding-top: 20px;
      border-top: 1px solid #eaeaea;
 }
+
+/* 導覽列樣式 */
+.navbar {
+     background: linear-gradient(to right, #007bff, #0056b3); /* 漸層藍色背景 */
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     color: #ffffff;
+     padding: 10px 0;
+     position: sticky;
+     top: 0;
+     z-index: 1000;
+}
+
+.navbar-container {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     flex-wrap: wrap;
+     background-color: #ffffff; /* 內部背景色調整為白色 */
+     border-radius: 8px; /* 圓角效果 */
+     padding: 5px; /* 內邊距增加，與外框有間隔 */
+     margin: 0 10px; /* 確保navbar-container不緊貼navbar邊緣 */
+}
+
+.navbar-container a {
+     color: #007bff; /* 文字顏色調整為藍色，確保對比 */
+     background-color: transparent; /* 背景色透明 */
+     margin: 0 12px;
+     padding: 8px 16px;
+     border-radius: 20px; /* 圓角邊框 */
+     transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar-container a:hover, .navbar-container a:focus {
+     background-color: #e7f1ff; /* 滑鼠懸停與聚焦時的背景色 */
+     color: #0056b3; /* 深藍色文字，保持視覺一致性 */
+     text-decoration: none;
+}
+
+/* 響應式佈局 */
+@media (max-width: 768px) {
+     .navbar-container {
+         justify-content: space-around; /* 專案在主軸上的對齊方式為兩端對齊 */
+     }
+
+     .navbar-container a {
+         margin: 10px 0; /* 在較小螢幕上增加垂直間距 */
+     }
+}
+
+/* Chart Container Style */
+.chart-container {
+     margin-top: 40px;
+     padding: 20px;
+     background-color: #fff; /* 白色背景 */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+     border-radius: 8px;
+}
+
+.chart-container h2 {
+     text-align: center;
+     color: #007bff;
+}
+
+#logoutBtn, #toggleChartBtn {
+     color: #ffffff;
+     background-color: #007bff;
+     border: 2px solid #ffffff; /* 新增白色邊框提升對比 */
+     padding: 8px 16px;
+     border-radius: 4px; /* 使用更細微的圓角 */
+     cursor: pointer;
+     text-decoration: none;
+     transition: background-color 0.3s, border-color 0.3s;
+     display: inline-block; /* 適應文字流版面設計 */
+     margin-left: auto; /* 登出按鈕向右對齊 */
+}
+
+#logoutBtn:hover, #toggleChartBtn:hover {
+     background-color: #004095; /* 懸停時背景色變深 */
+     border-color: #e7f1ff; /* 邊框顏色變化增加視覺回饋 */
+}

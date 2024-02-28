@@ -7,10 +7,10 @@ router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/login-form")
+@router.get("/login-form")  
 async def get_form(request: Request):
     return templates.TemplateResponse("loginform.html", {"request": request})
-
+    
 @router.post("/api/login")
 async def login(request: LoginRequest, login_service = Depends(get_login_service)):
     return login_service.login(request.login_identifier, request.password)

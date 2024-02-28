@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <div class="navbar" id="userNavbar">
+        <div class="container navbar-container">
+            <a href="/my-account">我的帳戶</a>
+            <a href="/my-diary">我的日記</a>
+            <a href="/about-iaceve">關於IACEve</a>
+            <a href="/logout" id="logoutBtn" style="display: none; float: right;">登出</a> <!-- 登出按鈕 -->
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>{{ page_title }}</h1>
@@ -42,11 +52,21 @@
             </section>
         </main>
         <footer>
-            <a href="/debate-form" class="action-btn debate-btn">加入投票或辯論</a>
+            <a href="/debate-form" class="action-btn debate-btn" style="display: none;">加入投票或辯論</a>
             <a href="/register-form" class="action-btn register-btn">註冊</a>
             <a href="/login-form" class="action-btn login-btn">登入</a>
         </footer>
+
+        <button id="toggleChartBtn" style="display: none;">顯示/隱藏統計結果</button>
+        <div class="container chart-container" id="dataChartContainer" style="display: none;">
+            <h2>檢視大眾價值觀</h2>
+            <canvas id="myChart"></canvas> <!-- 示例: 使用Chart.js -->
+        </div>
     </div>
+
+    <!-- Data Chart Container -->
+    
+
     <script src="/static/js/index.js"></script>
 </body>
 </html>

@@ -38,8 +38,12 @@ ph = PasswordHasher(
 class AuthService:
     @staticmethod
     def verify_password(plain_password, hashed_password):
-        return ph.hash(plain_password) == hashed_password
-    
+        try:
+            ph.verify(hashed_password, plain_password)
+            return True
+        except:
+            return False
+
     @staticmethod
     def generate_token(user):
         '''
@@ -62,3 +66,4 @@ class AuthService:
         secret = secret_secret("FakeIssue", "IsNotFake")
 
         return jwt.encode(payload, secret, algorithm='HS256')
+    
