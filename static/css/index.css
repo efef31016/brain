@@ -26,7 +26,14 @@ header h1 {
      margin: 0;
      color: #007bff;
      font-weight: 700;
+     animation: flash 1s ease-in-out;
 }
+
+
+@keyframes flash {
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.5; }
+ }
 
 header p {
      color: #666;
@@ -129,10 +136,12 @@ footer {
      justify-content: space-between;
      align-items: center;
      flex-wrap: wrap;
-     background-color: #ffffff; /* 內部背景色調整為白色 */
-     border-radius: 8px; /* 圓角效果 */
-     padding: 5px; /* 內邊距增加，與外框有間隔 */
-     margin: 0 10px; /* 確保navbar-container不緊貼navbar邊緣 */
+     background-color: #ffffff;
+     border-radius: 8px;
+     padding: 5px;
+     margin: 0 10px;
+     animation: slideInFromLeft 1.5s ease-out forwards; /* 使用 forwards 讓動畫完成後保持在最終狀態 */
+     opacity: 0; /* 初始狀態不可見 */
 }
 
 .navbar-container a {
@@ -141,7 +150,8 @@ footer {
      margin: 0 12px;
      padding: 8px 16px;
      border-radius: 20px; /* 圓角邊框 */
-     transition: background-color 0.3s, color 0.3s;
+     box-shadow: inset 0 0 0 0 #0056b3;
+     transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
 }
 
 .navbar-container a:hover, .navbar-container a:focus {
@@ -160,6 +170,17 @@ footer {
          margin: 10px 0; /* 在較小螢幕上增加垂直間距 */
      }
 }
+
+@keyframes slideInFromLeft {
+     0% {
+         transform: translateX(-100%);
+         opacity: 0;
+     }
+     100% {
+         transform: translateX(0);
+         opacity: 1;
+     }
+ }
 
 /* Chart Container Style */
 .chart-container {

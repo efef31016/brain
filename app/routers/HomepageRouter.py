@@ -10,7 +10,7 @@ templates = Jinja2Templates(directory="templates")
 async def get_home(request: Request, topic_id: str = None):
 
     page_title = "歡迎來到辯論大會"
-    welcome_message = "僅做為學術研究，請先不要起爭議..."
+    welcome_message = "讓我們理性討論與接納所有不同"
     
     if topic_id and topic_id in debates_info:
         page_title = debates_info[topic_id]

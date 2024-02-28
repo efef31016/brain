@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
     <link rel="icon" href="/static/images/logo.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
     <!-- Navigation Bar -->
     <div class="navbar" id="userNavbar">
         <div class="container navbar-container">
-            <a href="/my-account">我的帳戶</a>
-            <a href="/my-diary">我的日記</a>
-            <a href="/about-iaceve">關於IACEve</a>
-            <a href="/logout" id="logoutBtn" style="display: none; float: right;">登出</a> <!-- 登出按鈕 -->
+            <a href="/my-account"><i class="fas fa-user"></i> 我的帳戶</a>
+            <a href="/my-diary"><i class="fas fa-book"></i> 我的日記</a>
+            <a href="/about-iaceve"><i class="fas fa-info-circle"></i> 關於IACEve</a>
+            <a href="/logout" id="logoutBtn" style="display: none;"><i class="fas fa-sign-out-alt"></i> 登出</a>
         </div>
-    </div>
+   </div>
 
     <div class="container">
         <header>
@@ -59,7 +60,7 @@
 
         <button id="toggleChartBtn" style="display: none;">顯示/隱藏統計結果</button>
         <div class="container chart-container" id="dataChartContainer" style="display: none;">
-            <h2>檢視大眾價值觀</h2>
+            <h2>有趣的見解們</h2>
             <canvas id="myChart"></canvas> <!-- 示例: 使用Chart.js -->
         </div>
     </div>
