@@ -2,7 +2,9 @@ from argon2 import PasswordHasher
 import jwt
 import datetime
 from contextlib import closing
-
+import os
+from dotenv import load_dotenv
+load_dotenv(r"D:\brain\.env")
 
 ph = PasswordHasher(
     time_cost=4,  # 執行時間
@@ -36,9 +38,7 @@ class AuthService:
             # "first_login": False
         }
 
-        secret = "FakeIssue"
-
-        token = jwt.encode(payload, secret, algorithm='HS256')
+        token = jwt.encode(payload, os.getenv("SECRET"), algorithm='HS256')
         
         return token
     
@@ -50,7 +50,7 @@ class AuthService:
             INSERT INTO \"user\".token_blacklist (user_id, token, device_id)
             VALUES (%s, %s, %s)
         """
-        # 注意傳遞user_id和device_id作為參數
+        # 注意傳遞 user_id 和 device_id 作為參數
         return self.postgresql_user_op.db_config.insert(query, (user_id, token, device_id))
 
     def is_token_blacklisted(self, token: str) -> bool:

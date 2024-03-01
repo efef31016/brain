@@ -197,6 +197,7 @@ footer {
 }
 
 #logoutBtn, #toggleChartBtn {
+     text-align: center;
      color: #ffffff;
      background-color: #007bff;
      border: 2px solid #ffffff; /* 新增白色邊框提升對比 */

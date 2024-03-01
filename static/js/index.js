@@ -52,11 +52,12 @@ async function logout() {
             },
             body: JSON.stringify({ device_id: deviceId })
         });
+        
 
         const data = await response.json();
         if (data.status === "success") {
             localStorage.removeItem('access_token');
-            localStorage.removeItem('device_id');
+            localStorage.removeItem('device_id');   
             updateUIForLoggedOut(true); // 傳入true以重定向
         } else {
             console.error('Logout failed:', data.message);

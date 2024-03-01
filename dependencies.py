@@ -4,7 +4,6 @@ from Config import login_service
 from Config import logout_service
 from Config import vote_counts_service
 
-
 def get_email_service():
     return email_service
 
