@@ -6,9 +6,13 @@
     <link rel="stylesheet" href="/static/css/registerform.css">
 </head>
 <body>
-    <div id="overlay" style="display:none;">
-        <div id="loadingMessage">創建用戶中...</div>
+    <div id="overlay-email" style="display:none;">
+        <div id="loadingMessage-email">寄送電子郵件中...</div>
     </div>
+    <div id="overlay-register" style="display:none;">
+        <div id="loadingMessage-register">創建用戶中...</div>
+    </div>
+    
     <div id="error-message" style="display:none;"></div>
     <form id="main-form" action="/api/register-submit-form" method="post">
         <div class="form-group">

@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const verifyButton = document.getElementById('verify-email-btn');
     const emailInput = document.getElementById('email');
     const verificationCodeInput = document.getElementById('verification-code');
-    const overlay = document.getElementById('overlay');
+    const overlayEmail = document.getElementById('overlay-email');
+    const overlayRegister = document.getElementById('overlay-register');
     
     // 前端驗證規則
     const rules = [
@@ -64,7 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        overlay.style.display = 'flex';
+        overlayRegister.style.display = 'flex';
+        animateDots('loadingMessage-register');
 
         // 如果前端驗證通過，則處理後端驗證邏輯
         let formData = new FormData(this);
@@ -73,7 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
             body: formData
         })
         .then(handleResponse)
-        .catch(handleError);
+        .catch(handleError)
+        .finally(() => {
+            overlayRegister.style.display = 'none'; // 隱藏覆蓋層
+        });
     });
 
     // 負責處理伺服器成功傳回的回應（包括處理業務邏輯錯誤，即雖然請求成功，但業務邏輯上存在錯誤）
@@ -83,8 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 throw {isApiError: true, message: data.message};
             }
-            await delay(1500);
-            overlay.style.display = 'none';
+            overlayRegister.style.display = 'none';
             showNotification(data.message, true);
             await delay(1500);
             window.location.href = '/';
@@ -100,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             message = error.message;
         }
         await delay(1000);
-        overlay.style.display = 'none';
+        overlayRegister.style.display = 'none';
         showNotification(message, false);
     }
 
@@ -120,6 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var email = document.getElementById('email').value;
         if (email) {
             // 顯示載入提示
+            overlayEmail.style.display = 'flex';
+            const emailAnimationInterval = animateDots('loadingMessage-email');
             this.textContent = '發送...';
             this.disabled = true; // 停用按鈕
             fetch('/api/send-verification-email', {
@@ -147,6 +153,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 showNotification(error); // 使用showNotification顯示錯誤
                 this.disabled = false; // 請求失敗後啟用按鈕
                 this.textContent = '發送電子郵件';
+            })
+            .finally(() => {
+                clearInterval(emailAnimationInterval);
+                overlayEmail.style.display = 'none';
             });
         } else {
             showNotification('請輸入有效的電子郵件地址。'); // 使用showNotification顯示錯誤
@@ -177,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('verify-email-btn').disabled = true;
             })
             .catch(error => {
-                showNotification(error, true); // 使用showNotification顯示錯誤
+                showNotification(error, false); // 使用showNotification顯示錯誤
             });
         } else {
             showNotification('請輸入驗證碼。'); // 使用showNotification顯示錯誤
@@ -191,7 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
             notification.remove();
         });
     
- 
         const notification = document.createElement("div");
         notification.className = `notification ${isSuccess ? 'notification-success' : 'notification-error'}`;
         notification.textContent = message;
@@ -213,3 +222,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 });
+
+function animateDots(elementId) {
+    let dotCount = 0;
+    const maxDots = 3;
+    const intervalId = setInterval(() => {
+        const element = document.getElementById(elementId);
+        if (!element) {
+            clearInterval(intervalId); // 如果元素不存在，則停止動畫
+            return;
+        }
+
+        const baseText = element.textContent.replace(/\.+$/, ''); // 移除末端的點
+        dotCount = (dotCount % maxDots) + 1; // 更新點的數量
+        const newText = baseText + '.'.repeat(dotCount); // 建立新文字
+        element.textContent = newText; // 更新元素的文本
+    }, 500); // 每500毫秒更新一次
+
+    return intervalId; // 傳回定時器ID以便於後續可以清除定時器
+}

@@ -126,7 +126,7 @@ body {
     background-color: #F44336; /* 紅色 */
 }
 
-#overlay {
+#overlay-email, #overlay-register {
     position: fixed;
     top: 0;
     left: 0;
@@ -138,7 +138,7 @@ body {
     align-items: center;
 }
 
-#loadingMessage {
+#loadingMessage-email, #loadingMessage-register {
     padding: 20px;
     background: white;
     border-radius: 5px;

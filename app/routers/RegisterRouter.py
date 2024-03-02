@@ -21,7 +21,7 @@ async def send_verification_email(email_data: EmailSchema, email_service=Depends
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"message": str(e.detail)})
 
-    subject = "[Let\'s Debate]Email Verification"
+    subject = "[Let\'s Debate]信箱驗證"
     body = f"請利用以下驗證碼完成電子信箱認證:\n{verification_code}"
     email_service.send_email(receiver_email=email, subject=subject, body=body)
     

@@ -1,6 +1,7 @@
 import re
 import uuid
 from services.AuthService import ph
+import zlib
 from fastapi import HTTPException
 
 class RegisterService:
@@ -13,9 +14,9 @@ class RegisterService:
     def _generate_initial_verify_code(self):
         # 初始邀請碼
         init_token = "FakeIssue"
-        initial_code = ph.hash(init_token)
+        init_token = self._crc_sixteen(init_token)
         # 使用 redis_session_op 初始化第一代邀請碼使用次數
-        self.redis_session_op.redis_config.set_value("verify_usage:" + initial_code, 0) 
+        self.redis_session_op.redis_config.set_value("verify_usage:" + init_token, 0) 
         return
     
     def register(self, snick, pwd, email, verify):
@@ -69,7 +70,7 @@ class RegisterService:
 
     def _generate_uuid_and_token(self):
         person_uuid = str(uuid.uuid4())
-        token = ph.hash(person_uuid)
+        token = self._crc_sixteen(person_uuid)
         # 初始化新 token 的使用次數
         self.redis_session_op.redis_config.set_value("verify_usage:" + token, 0)
         return person_uuid, token
@@ -77,3 +78,8 @@ class RegisterService:
     def _validate_input(self, value, pattern, field_name):
         if not re.match(pattern, value):
             raise HTTPException(status_code=400, detail=f"{field_name} input is invalid.")
+        
+    def _crc_sixteen(self, invited):
+        init_token = invited.encode('utf-8')
+        initial_code = zlib.crc32(init_token)
+        return format(initial_code, '08x')

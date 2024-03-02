@@ -21,7 +21,7 @@ class EmailService:
         if self.redis_session_op.redis_config.find_a_set(email):
             raise HTTPException(status_code=400, detail="此信箱已認證，請直接跳過驗證步驟")
         
-        verification_code = secrets.token_urlsafe()
+        verification_code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
         # 過期時間 10 分鐘
         self.redis_session_op.redis_config.set_value_with_expiration(f"verification:{email}", verification_code, 600)
         return verification_code
@@ -71,4 +71,3 @@ if __name__ == "__main__":
     subject = "Your Verification Code"
     body = f"Your verification code is: {verification_code}\nPlease use this code to complete your email verification."
     email_service.send_email(receiver_email=email, subject=subject, body=body)
-    
