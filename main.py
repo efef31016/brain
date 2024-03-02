@@ -8,6 +8,7 @@ from app.routers.LogoutRouter import router as logout_router
 from app.routers.VoteCountsRouter import router as vote_counts_router
 from app.routers.ChooseTopicRouter import router as choose_topic_router
 # from app.routers.DebateFormRouter import router as debate_form_router
+from app.routers.MyAccountRouter import router as my_account_router
 
 app = FastAPI()
 
@@ -20,6 +21,7 @@ app.include_router(logout_router)
 app.include_router(vote_counts_router)
 app.include_router(choose_topic_router)
 # app.include_router(debate_form_router)
+app.include_router(my_account_router)
 
 @app.on_event("startup")
 async def startup_event():

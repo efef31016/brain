@@ -5,13 +5,13 @@ from email.mime.text import MIMEText
 from fastapi import HTTPException
 
 class EmailService:
-     def __init__(self, postgresql_user_op, redis_session_op, sender_email, sender_password):
+    def __init__(self, postgresql_user_op, redis_session_op, sender_email, sender_password):
         self.postgresql_user_op = postgresql_user_op
         self.redis_session_op = redis_session_op
         self.sender_email = sender_email
         self.sender_password = sender_password
 
-     def generate_and_save_verification_code(self, email):
+    def generate_and_save_verification_code(self, email):
 
         sql = "SELECT * FROM \"user\".users WHERE email = %s LIMIT 1;"
         result = self.postgresql_user_op.db_config.select(sql, (email,))
@@ -26,7 +26,7 @@ class EmailService:
         self.redis_session_op.redis_config.set_value_with_expiration(f"verification:{email}", verification_code, 600)
         return verification_code
     
-     def send_email(self, receiver_email, subject, body):
+    def send_email(self, receiver_email, subject, body):
         # 建構 MIME 多部分訊息對象
         message = MIMEMultipart()
         message["From"] = self.sender_email
@@ -46,7 +46,7 @@ class EmailService:
         except Exception as e:
             print(f"Failed to send email: {e}")
 
-     def verify_email_code(self, email, user_code):
+    def verify_email_code(self, email, user_code):
         stored_code = self.redis_session_op.redis_config.get_value(f"verification:{email}")
         if stored_code and stored_code == user_code:
             self.redis_session_op.redis_config.set_a_set("verified_emails", email)
