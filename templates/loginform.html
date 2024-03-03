@@ -7,20 +7,26 @@
      <link rel="stylesheet" href="/static/css/loginform.css">
 </head>
 <body>
-     <div class="login-container">
-         <form id="login-form">
-             <div class="form-group">
-                 <label for="login-identifier">使用者名稱或電子郵件:</label>
-                 <input type="text" id="login-identifier" name="login-identifier" required>
-             </div>
-             <div class="form-group">
-                 <label for="password">密碼:</label>
-                 <input type="password" id="password" name="password" required>
-             </div>
-             <button type="submit" class="submit-btn">登入</button>
-         </form>
-         <div id="feedback" class="feedback"></div>
-     </div>
-     <script src="/static/js/loginform.js"></script>
+    <div class="login-container">
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-identifier">使用者名稱或電子郵件:</label>
+                <input type="text" id="login-identifier" name="login-identifier" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密碼:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="button-container"> <!-- 新增按鈕容器 -->
+                <button type="submit" class="submit-btn">登入</button>
+            </div>
+        </form>
+        <div class="action-links">
+            <a href="/forgot-password">忘記密碼</a>
+            <a href="/register-form">註冊</a>
+        </div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+    <script src="/static/js/loginform.js"></script>
 </body>
 </html>

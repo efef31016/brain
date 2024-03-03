@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 showNotification(data.message, true); // 顯示成功訊息
-                document.getElementById('email-verified-icon').textContent = '...';
+                document.getElementById('email-verified-icon').textContent = '...信箱待驗證';
                 document.getElementById('email-verified-icon').style.color = 'orange';
                 document.getElementById('send-verify-email-btn').style.display = 'none';
                 document.getElementById('verification-container').style.display = 'block';
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 showNotification(data.message, true); // 顯示成功訊息
-                document.getElementById('email-verified-icon').textContent = '✔';
+                document.getElementById('email-verified-icon').textContent = '✔已成功驗證';
                 document.getElementById('email-verified-icon').style.color = 'green';
                 document.getElementById('verify-email-btn').disabled = true;
             })
@@ -200,21 +200,32 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.notification').forEach(notification => {
             notification.remove();
         });
-    
+   
         const notification = document.createElement("div");
         notification.className = `notification ${isSuccess ? 'notification-success' : 'notification-error'}`;
         notification.textContent = message;
-        notification.style.opacity = "1";
-        notification.style.transition = "opacity 0.5s ease";
-    
+   
+        // 套用初始樣式以準備動畫
+        notification.style.opacity = "0";
+        notification.style.transform = "translateY(-20px)";
+   
         document.body.appendChild(notification);
-    
+   
+        // 使用setTimeout確保元素已插入DOM，然後開始動畫
+        setTimeout(() => {
+            notification.style.opacity = "1";
+            notification.style.transform = "translateY(0)";
+            notification.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+        }, 10);
+   
+        // 設定定時器以在動畫完成後刪除通知
         setTimeout(() => {
             notification.style.opacity = "0";
+            notification.style.transform = "translateY(-20px)";
             notification.addEventListener('transitionend', () => {
                 notification.remove();
             });
-        }, 3000);
+        }, 5000); // 訊息顯示5秒後開始消失動畫
     }
 
     // 停頓

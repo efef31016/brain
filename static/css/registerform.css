@@ -11,33 +11,47 @@ body {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 稍微加深陰影，增加層次感 */
     width: 100%;
-    max-width: 500px;
+    max-width: 400px; /* 減少最大寬度，使頁面更緊湊 */
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 15px; /* 調整間距，使佈局更緊湊 */
+    animation: fadeInUp 0.5s ease-out forwards;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 5px;
+    font-size: 14px; /* 縮小字體大小，讓標籤更細緻 */
 }
 
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group select {
-    width: calc(100% - 22px);
-    padding: 10px;
+.form-group input, .form-group button {
+    width: 100%;
+    padding: 8px 10px; /* 減少填充，使輸入框和按鈕更加緊湊 */
+    font-size: 14px; /* 調整字體大小，保持與標籤一致 */
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-#verify-email-btn, #send-verify-email-btn {
-    margin-top: 10px;
-    padding: 10px 15px;
+#send-verify-email-btn, #verify-email-btn {
+    margin-top: 5px; /* 減少頂部間距 */
+    padding: 8px 10px; /* 縮小按鈕尺寸 */
+    font-size: 14px; /* 統一字體大小 */
     background-color: #007bff;
     color: white;
     border: none;
@@ -45,44 +59,65 @@ body {
     cursor: pointer;
 }
 
-#verify-email-btn:hover, #send-verify-email-btn:hover {
+#send-verify-email-btn:hover, #verify-email-btn:hover {
     background-color: #0056b3;
 }
 
 .submit-btn {
-    display: block;
-    width: 100%;
     padding: 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 16px; /* 保持提交按鈕的字體稍大，突出重要操作 */
+    animation: fadeInUp 0.5s ease-out forwards;
 }
 
 .submit-btn:hover {
     background-color: #45a049;
 }
 
+/* 設定動畫延遲 */
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.25s; }
+.form-group:nth-child(3) { animation-delay: 0.4s; }
+.form-group:nth-child(4) { animation-delay: 0.55s; }
+.form-group:nth-child(5) { animation-delay: 0.7s; }
+/* 因為提交按鈕在最後，所以我們給它設定更長的延遲 */
+.submit-btn { animation-delay: 0.85s; }
+
 #error-message {
     display: none; /* 預設隱藏 */
-    background-color: #ffdddd; /* 輕微紅色背景 */
-    color: #D8000C; /* 深紅色文字，提高對比度，確保可讀性 */
-    text-align: center; /* 文字居中 */
-    padding: 20px; /* 內邊距 */
-    margin: 20px 0; /* 外邊距 */
-    border: 1px solid #D8000C; /* 邊框 */
-    border-radius: 5px; /* 圓角邊框 */
-    position: fixed; /* 固定位置 */
-    top: 20px; /* 距離頂部的位置 */
-    left: 50%; /* 水平居中 */
-    transform: translateX(-50%); /* 配合left屬性實現真正的水平居中 */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 輕微的陰影 */
-    z-index: 1000; /* 確保訊息框在其他元素之上 */
-    width: auto; /* 自動寬度 */
-    max-width: 90%; /* 最大寬度，確保在小螢幕上也不會太寬 */
-    animation: fadeIn 0.5s, fadeOut 0.5s 4.5s; /* 淡入與延時淡出動畫 */
+    background-color: #ffdddd; /* 淺紅色背景 */
+    color: #D8000C; /* 深紅字 */
+    text-align: center;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #D8000C;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 10px;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: auto;
+    max-width: 80vw; /* 調整最大寬度 */
+    max-height: 80vh; /* 最小高度 */
+    overflow-y: auto; /* 允許垂直滾動 */
+}
+
+/* 響應式設計：針對小螢幕裝置的樣式 */
+@media (max-width: 600px) {
+    #error-message {
+        font-size: 12px; /* 進一步縮小字體大小 */
+        padding: 8px; /* 進一步減少內邊距 */
+        max-width: 95vw; /* 在小螢幕上使用較大的寬度百分比 */
+        max-height: 50vh; /* 在小螢幕上減少最大高度，以適應較小的視口 */
+        overflow-y: auto; /* 確保能夠滾動查看 */
+    }
 }
 
 @keyframes fadeIn {
@@ -124,6 +159,14 @@ body {
 /* 錯誤訊息的背景色 */
 .notification-error {
     background-color: #F44336; /* 紅色 */
+}
+
+.overlay {
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.input-error {
+    transition: border-color 0.3s ease;
 }
 
 #overlay-email, #overlay-register {

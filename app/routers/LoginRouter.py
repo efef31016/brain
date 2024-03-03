@@ -14,3 +14,7 @@ async def get_form(request: Request):
 @router.post("/api/login")
 async def login(request: LoginRequest, login_service = Depends(get_login_service)):
     return login_service.login(request.login_identifier, request.password, request.device_id)
+
+@router.post("/api/forgot-password")
+async def forgot_password():
+    return

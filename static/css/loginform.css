@@ -2,36 +2,56 @@
     max-width: 400px;
     margin: auto;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
 .form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
+    margin-bottom: 20px; /* 保持原樣，確保足夠的間距 */
 }
 
 .form-group input {
-    width: 100%;
+    width: calc(100% - 20px); /* 調整寬度以適應邊距 */
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* 輸入框內部陰影 */
+}
+
+.button-container {
+    display: flex;
+    justify-content: center; /* 使按鈕在容器中居中 */
+    margin-top: 10px; /* 適當的上邊距離 */
 }
 
 .submit-btn {
     width: 100%;
-    padding: 10px;
-    border: none;
-    background-color: blue;
+    padding: 8px 16px; /* 更細緻的按鈕大小 */
+    background-color: #007bff;
     color: white;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-evenly; /* 改進連結的分佈 */
+}
+
+.action-links a {
+    color: #007bff;
+    font-weight: bold; /* 加粗字體可提高可讀性 */
+    transition: color 0.3s ease; /* 增加顏色過渡效果 */
+}
+
+.action-links a:hover {
+    color: #0056b3; /* 滑鼠懸停時更深的顏色 */
 }
 
 .feedback {
-    margin-top: 15px;
-    text-align: center;
+    margin-top: 20px;
+    color: #666; /* 調整回饋訊息的顏色 */
 }
