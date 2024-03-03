@@ -1,5 +1,6 @@
 import secrets
 import smtplib
+import urllib.parse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from fastapi import HTTPException
@@ -26,22 +27,25 @@ class EmailService:
         self.redis_session_op.redis_config.set_value_with_expiration(f"verification:{email}", verification_code, 600)
         return verification_code
     
-    def send_email(self, receiver_email, subject, body):
-        # 建構 MIME 多部分訊息對象
+    def send_email(self, receiver_email, subject, body, is_html=False):
+        # 建立 MIME 多部分訊息對象
         message = MIMEMultipart()
         message["From"] = self.sender_email
         message["To"] = receiver_email
         message["Subject"] = subject
 
-        # 新增郵件正文
-        message.attach(MIMEText(body, "plain"))
+        if is_html:
+            # 新增郵件內文為HTML
+            message.attach(MIMEText(body, "html"))
+        else:
+            # 新增郵件內文為純文字
+            message.attach(MIMEText(body, "plain"))
 
         try:
             # 建立 SMTP 會話並傳送郵件
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
                 server.login(self.sender_email, self.sender_password)
-                text = message.as_string()
-                server.sendmail(self.sender_email, receiver_email, text)
+                server.sendmail(self.sender_email, receiver_email, message.as_string())
             print("Email sent successfully!")
         except Exception as e:
             print(f"Failed to send email: {e}")
@@ -53,6 +57,21 @@ class EmailService:
             return True
         else:
             return False
+        
+    def send_password_reset_email(self, email):
+        # 產生一個安全的令牌
+        token = secrets.token_urlsafe(16)
+        # 保存令牌和郵箱的對應到Redis，過期時間為10分鐘
+        self.redis_session_op.redis_config.set_value_with_expiration(f"reset_password_token:{token}", email, 600)
+        # 建立重設密碼的URL
+        reset_password_url = f"http://localhost:8000/reset-password?token={urllib.parse.quote_plus(token)}"
+
+        # 郵件主題和正文
+        subject = "重設您的密碼"
+        body = f"請點擊以下連結重設您的密碼: <a href='{reset_password_url}'>{reset_password_url}</a>"
+
+        # 發送郵件
+        self.send_email(receiver_email=email, subject=subject, body=body, is_html=True)
         
 
 if __name__ == "__main__":

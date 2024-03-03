@@ -6,6 +6,7 @@ from services.LogoutService import LogoutService
 from services.VoteCountsService import VoteCountsService
 from services.EmailService import EmailService
 from services.MyAccountService import MyAccountService
+from services.ResetPasswordService import ResetPasswordService
 from data_access.DatabaseDA import Neo4jUserOperation, RedisSessionOperation, PostgresqlUserOperation
 import os
 from dotenv import load_dotenv
@@ -32,3 +33,4 @@ vote_counts_service = VoteCountsService(redis_session_op, postgresql_user_op)
 login_service = LoginService(postgresql_user_op)
 logout_service = LogoutService(postgresql_user_op)
 myaccount_service = MyAccountService(postgresql_user_op)
+reset_password_service = ResetPasswordService(postgresql_user_op, redis_session_op)

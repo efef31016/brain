@@ -52,4 +52,43 @@ document.addEventListener('DOMContentLoaded', () => {
             updateFeedback(error.message, false);
         }
     });
+
+    // 處理「忘記密碼」連結的邏輯
+    document.getElementById('reset-password-link').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('reset-password-modal').style.display = 'block';
+    });
+
+    // 關閉模態對話框
+    document.getElementsByClassName('close-button')[0].addEventListener('click', function() {
+        document.getElementById('reset-password-modal').style.display = 'none';
+    });
+
+    // 提交「重置密碼」請求
+    document.getElementById('submit-reset').addEventListener('click', function() {
+        var email = document.getElementById('email-for-reset').value;
+        // 傳送電子郵件地址到後端
+        fetch('/api/request-reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('網路回應不是OK');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 使用從後端回傳的訊息更新回饋訊息
+            updateFeedback(data.message, true);
+        })
+        .catch(error => {
+            console.error('發送重設密碼請求失敗:', error);
+            updateFeedback('發送重設密碼請求失敗，請稍後再試。', false);
+        });
+   
+        // 關閉模態視窗
+        document.getElementById('reset-password-modal').style.display = 'none';
+   });
 });

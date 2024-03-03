@@ -79,13 +79,13 @@ body {
 }
 
 /* 設定動畫延遲 */
-.form-group:nth-child(1) { animation-delay: 0.1s; }
-.form-group:nth-child(2) { animation-delay: 0.25s; }
-.form-group:nth-child(3) { animation-delay: 0.4s; }
-.form-group:nth-child(4) { animation-delay: 0.55s; }
-.form-group:nth-child(5) { animation-delay: 0.7s; }
+.form-group:nth-child(1) { animation-delay: 0.2s; }
+.form-group:nth-child(2) { animation-delay: 0.4s; }
+.form-group:nth-child(3) { animation-delay: 0.6s; }
+.form-group:nth-child(4) { animation-delay: 0.8s; }
+.form-group:nth-child(5) { animation-delay: 1.0s; }
 /* 因為提交按鈕在最後，所以我們給它設定更長的延遲 */
-.submit-btn { animation-delay: 0.85s; }
+.submit-btn { animation-delay: 1.2s; }
 
 #error-message {
     display: none; /* 預設隱藏 */
@@ -161,29 +161,23 @@ body {
     background-color: #F44336; /* 紅色 */
 }
 
-.overlay {
-    transition: opacity 0.5s ease, visibility 0.5s;
-}
-
-.input-error {
-    transition: border-color 0.3s ease;
-}
-
 #overlay-email, #overlay-register {
-    position: fixed;
+    position: fixed; /* 使用fixed定位，使覆蓋層相對於視窗定位 */
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%; /* 覆蓋層寬度擴展到整個視窗寬度 */
+    height: 100%; /* 覆蓋層高度擴展到整個視口高度 */
     background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; /* 使用Flex佈局，以便於內容居中顯示 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    z-index: 1000; /* 確保覆蓋層位於其他內容之上 */
+    display: none; /* 預設不顯示，透過JavaScript控制顯示 */
 }
 
 #loadingMessage-email, #loadingMessage-register {
     padding: 20px;
-    background: white;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background: white; /* 背景色 */
+    border-radius: 5px; /* 圓角 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 陰影效果 */
 }

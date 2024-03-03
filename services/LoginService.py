@@ -24,6 +24,3 @@ class LoginService:
                         }
         except Exception as e:
             return {"message": f'/api/login error:{e}'}
-        
-    def reset_password(self,):
-        pass

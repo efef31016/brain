@@ -22,9 +22,18 @@
             </div>
         </form>
         <div class="action-links">
-            <a href="/forgot-password">忘記密碼</a>
+            <a href="#" id="reset-password-link">忘記密碼</a>
             <a href="/register-form">註冊</a>
         </div>
+        <div id="reset-password-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>重設密碼</h2>
+                <p>請輸入您的電子郵件地址，我們將發送重設密碼的連結到您的郵箱。 </p>
+                <input type="email" id="email-for-reset" placeholder="您的電子郵件地址">
+                <button id="submit-reset">提交</button>
+            </div>
+       </div>
         <div id="feedback" class="feedback"></div>
     </div>
     <script src="/static/js/loginform.js"></script>
