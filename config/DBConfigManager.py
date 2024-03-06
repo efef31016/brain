@@ -1,7 +1,5 @@
 import os
-import redis
-import psycopg2
-from neo4j import GraphDatabase
+from config import RedisConfig, Neo4jConfig, PostgresqlConfig
 
 class DBConfigManager:
     @staticmethod
@@ -23,9 +21,28 @@ class DBConfigManager:
 
     @staticmethod
     def load_postgresql_config():
-        return PostgreSQLConfig(
+        return PostgresqlConfig(
             dbname=os.getenv('POSTGRESQL_DBNAME', 'dbname'),
             user=os.getenv('POSTGRESQL_USER', 'user'),
             password=os.getenv('POSTGRESQL_PASSWORD', 'password'),
             host=os.getenv('POSTGRESQL_HOST', 'localhost')
         )
+    
+
+if __name__ == "__main__":
+    redis_config = DBConfigManager.load_redis_config()
+    redis_connection = redis_config.get_connection()
+
+    # 加载Neo4j配置并获取驱动
+    neo4j_config = DBConfigManager.load_neo4j_config()
+    neo4j_driver = neo4j_config.get_driver()
+
+    # 使用完后关闭Neo4j连接
+    neo4j_config.close()
+
+    # 加载PostgreSQL配置并获取连接
+    postgresql_config = DBConfigManager.load_postgresql_config()
+    postgresql_connection = postgresql_config.get_connection()
+
+    # 使用完后确保关闭PostgreSQL连接
+    postgresql_connection.close()
