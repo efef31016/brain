@@ -1,5 +1,11 @@
-import os
-from config import RedisConfig, Neo4jConfig, PostgresqlConfig
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from dotenv import load_dotenv
+from RedisConfig import RedisConfig
+from Neo4jConfig import Neo4jConfig
+from PostgresqlConfig import PostgresqlConfig
+
+load_dotenv()
 
 class DBConfigManager:
     @staticmethod
@@ -22,10 +28,7 @@ class DBConfigManager:
     @staticmethod
     def load_postgresql_config():
         return PostgresqlConfig(
-            dbname=os.getenv('POSTGRESQL_DBNAME', 'dbname'),
-            user=os.getenv('POSTGRESQL_USER', 'user'),
-            password=os.getenv('POSTGRESQL_PASSWORD', 'password'),
-            host=os.getenv('POSTGRESQL_HOST', 'localhost')
+            uri=os.getenv('POSTGRESQL_URI', '')
         )
     
 
@@ -33,16 +36,12 @@ if __name__ == "__main__":
     redis_config = DBConfigManager.load_redis_config()
     redis_connection = redis_config.get_connection()
 
-    # 加载Neo4j配置并获取驱动
     neo4j_config = DBConfigManager.load_neo4j_config()
     neo4j_driver = neo4j_config.get_driver()
 
-    # 使用完后关闭Neo4j连接
     neo4j_config.close()
 
-    # 加载PostgreSQL配置并获取连接
     postgresql_config = DBConfigManager.load_postgresql_config()
-    postgresql_connection = postgresql_config.get_connection()
+    postgresql_connection = postgresql_config.get_session()
 
-    # 使用完后确保关闭PostgreSQL连接
     postgresql_connection.close()

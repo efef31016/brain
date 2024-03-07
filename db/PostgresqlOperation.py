@@ -1,7 +1,7 @@
-from db.operations import UserOperation
-from config.db_config_manager import DBConfigManager
+from db.Operations import UserOperation
+from config.DBConfigManager import DBConfigManager
 from contextlib import closing
-from models.user_model import User
+from models.UserModel import User
 
 class PostgresqlUserOperation(UserOperation):
     def __init__(self):

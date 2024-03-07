@@ -1,6 +1,6 @@
-from db.operations import UserOperation
-from config.db_config_manager import DBConfigManager
-from models.user_model import User
+from db.Operations import UserOperation
+from config.DBConfigManager import DBConfigManager
+from models.UserModel import User
 
 class Neo4jUserOperation(UserOperation):
     def __init__(self):

@@ -1,12 +1,18 @@
-import psycopg2
+from sqlalchemy import create_engine, exc
+from sqlalchemy.orm import scoped_session, sessionmaker
 
-class PostgreSQLConfig:
-    def __init__(self, dbname, user, password, host):
-        self.connection_string = f"dbname='{dbname}' user='{user}' password='{password}' host='{host}'"
-
-    def get_connection(self):
+class PostgresqlConfig:
+    def __init__(self, uri):
         try:
-            return psycopg2.connect(self.connection_string)
-        except psycopg2.DatabaseError as error:
-            print(f"Database connection error: {error}")
-            raise error
+            self.engine = create_engine(uri, pool_pre_ping=True)
+            self.session_factory = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+            self.Session = scoped_session(self.session_factory)
+        except exc.SQLAlchemyError as e:
+            raise ConnectionError(f"Failed to connect to PostgreSQL database: {e}")
+
+    def get_session(self):
+        return self.Session()
+
+    def close(self):
+        self.Session.remove()
+        self.engine.dispose()
