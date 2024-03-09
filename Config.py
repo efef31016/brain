@@ -3,12 +3,13 @@ from config.Neo4jConfig import Neo4jConfig
 from config.RedisConfig import RedisConfig
 from config.PostgresqlConfig import PostgresqlConfig
 from services.RegisterService import RegisterService
-from services.LoginService import LoginService
-from services.LogoutService import LogoutService
-from services.VoteCountsService import VoteCountsService
+from services.EmailVerificationService import EmailVerificationService
+# from services.LoginService import LoginService
+# from services.LogoutService import LogoutService
+# from services.VoteCountsService import VoteCountsService
 from services.EmailService import EmailService
-from services.MyAccountService import MyAccountService
-from services.ResetPasswordService import ResetPasswordService
+# from services.MyAccountService import MyAccountService
+# from services.ResetPasswordService import ResetPasswordService
 from db.Neo4jOperation import Neo4jUserOperation
 from db.RedisOperation import RedisSessionOperation
 from db.PostgresqlOperation import PostgresqlUserOperation
@@ -47,3 +48,6 @@ redis_session_op = RedisSessionOperation()
 postgresql_user_op = PostgresqlUserOperation()
 
 # 服務實例化，確保傳遞正確的依賴項
+email_service = EmailService()
+email_verify_service = EmailVerificationService()
+register_service = RegisterService(neo4j_user_op, postgresql_user_op, redis_session_op)
