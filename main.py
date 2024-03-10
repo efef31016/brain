@@ -23,12 +23,9 @@ app.include_router(choose_topic_router)
 # app.include_router(debate_form_router)
 # app.include_router(my_account_router)
 
-# @app.on_event("startup")
-# async def startup_event():
-    # initial invite token
-    # from dependencies import get_register_service
-    # init = get_register_service()
-    # init._generate_initial_verify_code()
+@app.on_event("startup")
+def startup_event():
+    pass
 
 
 

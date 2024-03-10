@@ -1,22 +1,12 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from dotenv import load_dotenv
-from RedisConfig import RedisConfig
 from Neo4jConfig import Neo4jConfig
 from PostgresqlConfig import PostgresqlConfig
 
 load_dotenv()
 
 class DBConfigManager:
-    @staticmethod
-    def load_redis_config():
-        return RedisConfig(
-            host=os.getenv('REDIS_HOST', 'localhost'),
-            port=int(os.getenv('REDIS_PORT', 6379)),
-            password=os.getenv('REDIS_PASSWORD', ''),
-            db=int(os.getenv('REDIS_DB', 0))
-        )
-
     @staticmethod
     def load_neo4j_config():
         return Neo4jConfig(

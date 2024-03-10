@@ -1,32 +1,35 @@
-from Config import email_service
-from Config import register_service
-from Config import email_verify_service
-# from Config import login_service
-# from Config import logout_service
-# from Config import vote_counts_service
-# from Config import myaccount_service
-# from Config import reset_password_service
+# dependencies.py
+from fastapi import Depends
+from config.RedisConfig import get_redis_pool
+
+from config_manager import ConfigManager
+from db.Neo4jOperation import Neo4jUserOperation
+from db.RedisOperation import RedisSessionOperation
+from db.PostgresqlOperation import PostgresqlUserOperation
+from services.RegisterService import RegisterService
+from services.EmailVerificationService import EmailVerificationService
+from services.EmailService import EmailService
+
+def get_neo4j_user_op():
+    return Neo4jUserOperation()
+
+def get_redis_session_op(redis_pool=Depends(get_redis_pool)):
+    return RedisSessionOperation(redis_pool)
+
+def get_postgresql_user_op():
+    return PostgresqlUserOperation()
 
 def get_email_service():
-    return email_service
+    return EmailService(ConfigManager.SENDER_EMAIL, ConfigManager.SENDER_PASSWORD, ConfigManager.SMTP_SERVER, ConfigManager.SMTP_PORT)
 
-def get_email_verify_service():
-    return email_verify_service
+def get_email_verification_service():
+    neo4j_op = get_neo4j_user_op()
+    redis_op = get_redis_session_op()
+    pg_op = get_postgresql_user_op()
+    return EmailVerificationService(redis_op, pg_op, neo4j_op)
 
 def get_register_service():
-    return register_service
-
-# def get_login_service():
-#     return login_service
-
-# def get_logout_service():
-#     return logout_service
-
-# def get_vote_counts_service():
-#     return vote_counts_service
-
-# def get_myaccount_service():
-#     return myaccount_service
-
-# def get_reset_password_service():
-#     return reset_password_service
+    neo4j_op = get_neo4j_user_op()
+    redis_op = get_redis_session_op()
+    pg_op = get_postgresql_user_op()
+    return RegisterService(neo4j_op, pg_op, redis_op)

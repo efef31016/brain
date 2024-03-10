@@ -1,30 +1,29 @@
-from db.Operations import UserOperation
+import asyncpg
 from config.DBConfigManager import DBConfigManager
-from contextlib import closing
-from models.UserModel import User
+from db.Operations import UserOperation
+from models.UserModel import PostgresqlUser
 
 class PostgresqlUserOperation(UserOperation):
     def __init__(self):
         self.config = DBConfigManager.load_postgresql_config()
 
-    async def save_user(self, user: User):
+    async def save_user(self, user: PostgresqlUser):
         query = """
         INSERT INTO users (uuid, name, email, password)
-        VALUES (%s, %s, %s, %s)
+        VALUES ($1, $2, $3, $4)
         """
-        parameters = (user.uuid, user.name, user.email, user.password)
-        with closing(self.config.get_connection()) as conn, conn.cursor() as cur:
-            cur.execute(query, parameters)
-            conn.commit()
+        async with asyncpg.create_pool(self.config.uri) as pool:
+            async with pool.acquire() as connection:
+                await connection.execute(query, user.uuid, user.name, user.email, user.password)
 
-    async def find_user(self, identifier: str):
+    async def find_user(self, identifier: str, user: PostgresqlUser):
         query = """
         SELECT * FROM users
-        WHERE name = %s OR email = %s
+        WHERE name = $1 OR email = $1
         """
-        with closing(self.config.get_connection()) as conn, conn.cursor() as cur:
-            cur.execute(query, (identifier, identifier))
-            result = cur.fetchone()
-            if result:
-                return User(uuid=result[0], name=result[1], email=result[2], password=result[3])
-            return None
+        async with asyncpg.create_pool(self.config.uri) as pool:
+            async with pool.acquire() as connection:
+                result = await connection.fetchrow(query, identifier)
+                if result:
+                    return user(uuid=result['uuid'], name=result['name'], email=result['email'], password=result['password'])
+                return None

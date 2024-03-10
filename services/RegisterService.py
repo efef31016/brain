@@ -1,7 +1,6 @@
 import re
 import uuid
 from services.AuthService import ph
-import zlib
 from fastapi import HTTPException
 
 class RegisterService:
@@ -12,6 +11,12 @@ class RegisterService:
         self.neo4j_user_op = neo4j_user_op
         self.postgresql_user_op = postgresql_user_op
         self.redis_session_op = redis_session_op
+
+    async def generate_initial_invite_code(self):
+        invite_code = str(uuid.uuid4())[:8].upper()
+        await self.redis_session_op.redis_config.set_value("verification_usage:" + invite_code, 0, expire=86400)
+        await self.redis_session_op.redis_config.set_value("initial_invite_code", invite_code)
+        print(f"Initial invite code: {invite_code}")
 
     async def register(self, username, password, email, verification_code):
         await self._validate_username(username)
@@ -41,13 +46,13 @@ class RegisterService:
             raise HTTPException(status_code=400, detail="This email is already registered.")
 
     async def _validate_verification_code(self, verification_code):
-        usage_count = await self.redis_session_op.redis_config.get_value("verify_usage:" + verification_code)
+        usage_count = await self.redis_session_op.redis_config.get_value("verification_usage:" + verification_code)
         if usage_count is None or int(usage_count) >= 5:
             raise HTTPException(status_code=400, detail="Verification code is invalid or has been used too many times.")
 
-        await self.redis_session_op.redis_config.increment_value("verify_usage:" + verification_code)
+        await self.redis_session_op.redis_config.increment_value("verification_usage:" + verification_code)
 
     async def _save_user_info(self, username, email, hashed_password, person_uuid, new_verification_code, verification_code):
         await self.postgresql_user_op.save_user(username, email, hashed_password, person_uuid)
         await self.neo4j_user_op.save_user(person_uuid, new_verification_code, verification_code)
-        await self.redis_session_op.redis_config.set_value("verify_usage:" + verification_code, 1)
+        await self.redis_session_op.redis_config.set_value("verification_usage:" + verification_code, 1)

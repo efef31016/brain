@@ -1,21 +1,32 @@
 # https://developer.redis.com/create/windows/
-import redis
+import aioredis
+from fastapi import Depends, BackgroundTasks
+import os
 
 class RedisConfig:
-    def __init__(self, host, port, password, db, decode_responses=True):
-        self.host = host
-        self.port = port
+    def __init__(self, host: str, port: int, password: str, db: int, decode_responses: bool = True):
+        self.redis_url = f"redis://{host}:{port}"
         self.password = password
         self.db = db
+        self.decode_responses = decode_responses
 
-        try:
-            self.pool = redis.ConnectionPool(host=host, port=port, password=password, db=db, decode_responses=decode_responses)
-            self.redis = redis.Redis(connection_pool=self.pool)
-        except redis.RedisError as e:
-            raise ConnectionError(f"Failed to connect to Redis: {e}")
+    async def create_redis_pool(self):
+        return await aioredis.create_redis_pool(
+            self.redis_url,
+            password=self.password,
+            db=self.db,
+            decode_responses=self.decode_responses
+        )
 
-    def get_connection(self):
-        return self.redis
-    
-    def get_url(self):
-        return f"redis://:{self.password}@{self.host}:{self.port}/{self.db}"
+def load_redis_config():
+    return RedisConfig(
+        host=os.getenv('REDIS_HOST', 'localhost'),
+        port=int(os.getenv('REDIS_PORT', 6379)),
+        password=os.getenv('REDIS_PASSWORD', ''),
+        db=int(os.getenv('REDIS_DB', 0))
+    )
+
+async def get_redis_pool(background_tasks: BackgroundTasks, redis_config: RedisConfig = Depends(load_redis_config)) -> aioredis.Redis:
+    pool = await redis_config.create_redis_pool()
+    background_tasks.add_task(pool.close)
+    return pool
