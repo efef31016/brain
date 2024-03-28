@@ -17,9 +17,9 @@ sender_email = os.getenv("GMAIL_USER")
 sender_password = os.getenv("GMAIL_PASSWORD")
 
 # 配置實例化
-neo4j_config = Neo4jConfig(uri="bolt://localhost:7687", user="neo4j", password="brainconnect")
-redis_config = RedisConfig(host="localhost", port=6379, password="brainconnect", db=0, decode_responses=True)
-postgresql_config = PostgreSQLConfig(dbname="brain", user="postgres", password="learnsome")
+neo4j_config = Neo4jConfig(uri="bolt://localhost:7687", user="neo4j", password="brainconnection")
+redis_config = RedisConfig(host="localhost", port=6379, password="brainconnection", db=0, decode_responses=True)
+postgresql_config = PostgreSQLConfig(dbname="brain", user="postgres", password="JiaoBrain")
 
 # 資料存取操作實例化
 neo4j_user_op = Neo4jUserOperation(neo4j_config)

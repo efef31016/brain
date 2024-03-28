@@ -26,31 +26,53 @@
         </header>
         <main>
             <section class="counts">
-                <div class="count support">
-                    <h2>支持</h2>
-                    <p id="trueCount">Loading...</p>
+                <div class="row">
+                    <div class="count academic">
+                        <h2>農業學者</h2>
+                        <p id="academic">Loading...</p>
+                    </div>
+                    <div class="count expert">
+                        <h2>農業老手</h2>
+                        <p id="expert">Loading...</p>
+                    </div>
                 </div>
-                <div class="count oppose">
-                    <h2>不支持</h2>
-                    <p id="falseCount">Loading...</p>
+                <div class="row">
+                    <div class="count worker">
+                        <h2>農業工作者</h2>
+                        <p id="worker">Loading...</p>
+                    </div>
+                    <div class="count developer">
+                        <h2>技術開發人員</h2>
+                        <p id="developer">Loading...</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="count student">
+                        <h2>學生</h2>
+                        <p id="student">Loading...</p>
+                    </div>
+                    <div class="count others">
+                        <h2>其他領域</h2>
+                        <p id="others">Loading...</p>
+                    </div>
                 </div>
             </section>
             <section class="debate-selection">
-                <label for="debate-topics" class="visually-hidden">選擇辯論題目</label>
-                <select id="debate-topics" aria-label="選擇辯論題目" onchange="handleTopicChange()">
-                    <option value="">選擇辯論題目</option>
-                    <option value="cancel-entrance-exam">是否應該取消大學入學考試？</option>
-                    <option value="ban-smoking">是否應在所有公共場所全面禁煙？</option>
-                    <option value="higher-taxes-for-rich">是否應該對富人徵收更高的稅率？</option>
-                    <option value="same-sex-marriage">是否應該支持同性婚姻？</option>
-                    <option value="abolish-death-penalty">是否應該廢除死刑？</option>
-                    <option value="global-education-system">是否應該在全球範圍內實施統一的教育制度？</option>
-                    <option value="social-media-regulation">是否應該對社群媒體平台上的內容進行更嚴格的監管？</option>
-                    <option value="gene-editing">是否應該允許基因編輯技術用於人類胚胎？</option>
-                    <option value="universal-basic-income">是否應該實施全民基本收入？</option>
-                    <option value="penalties-for-polluters">是否應該對環境污染企業施加更重的罰款？</option>
+                <label for="debate-topics" class="visually-hidden">選擇農業技術辯論題目</label>
+                <select id="debate-topics" aria-label="選擇農業技術辯論題目" onchange="handleTopicChange()">
+                    <option value="">選擇農業技術辯論題目</option>
+                    <option value="data-analytics-in-agriculture">農業資料分析：數位科技如何引領農業革新？</option>
+                    <option value="iot-in-agriculture">物聯網在智慧農業：連結土地與科技的未來</option>
+                    <option value="automation-and-robotics">自動化與機器人技術：重塑農業生產的未來</option>
+                    <option value="drone-usage-for-crop-monitoring">無人機在作物監測的應用：高空中的農業守望者</option>
+                    <option value="smart-irrigation-systems">智慧灌溉系統：節水高效率的農業灌溉解決方案</option>
+                    <option value="ai-in-pest-and-disease-detection">人工智慧在病蟲害檢測：提升預防與管理的智慧</option>
+                    <option value="blockchain-for-food-traceability">區塊鏈技術實現食品追溯：從田間到餐桌的透明之旅</option>
+                    <option value="vertical-and-urban-farming">垂直與城市農業：創新農業在都市中的實踐</option>
+                    <option value="agri-tech-for-sustainable-farming">促進永續農業的關鍵農業技術：為未來種下希望</option>
+                    <option value="challenges-in-implementing-smart-agriculture">實施智慧農業的挑戰：探索創新與永續性的平衡</option>
                 </select>
-            </section>
+            </section>            
         </main>
         <footer>
             <a href="/debate-form" class="action-btn debate-btn" style="display: none;">加入投票或辯論</a>

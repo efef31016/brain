@@ -9,8 +9,8 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/")
 async def get_home(request: Request, topic_id: str = None):
 
-    page_title = "歡迎來到辯論大會"
-    welcome_message = "讓我們理性討論與接納所有不同"
+    page_title = "智慧農業探討"
+    welcome_message = "探索智慧農業的未來與創新"
     
     if topic_id and topic_id in debates_info:
         page_title = debates_info[topic_id]
